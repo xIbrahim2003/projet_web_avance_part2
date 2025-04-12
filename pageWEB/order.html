@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nouvelle commande</title>
+  <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/page/index.html"> Accueil</a> |
+    <a href="/page/order.html"> Créer une commande</a> |
+    <a href="/page/track.html"> Suivre une commande</a> |
+    <a href="/page/update.html"> Mettre à jour / Payer</a>
+  </nav>
+
+  <h1>Créer une commande (multi-produits)</h1>
+  <form id="orderForm">
+    <div id="productList">
+      <div class="product">
+        <label>ID du produit: <input name="id" type="number" required></label>
+        <label>Quantité: <input name="quantity" type="number" required></label>
+      </div>
+    </div>
+    <button type="button" onclick="addProduct()">+ Ajouter un produit</button><br><br>
+    <button type="submit">Commander</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    function addProduct() {
+      const productDiv = document.createElement("div");
+      productDiv.classList.add("product");
+      productDiv.innerHTML = `
+        <label>ID du produit: <input name="id" type="number" required></label>
+        <label>Quantité: <input name="quantity" type="number" required></label>
+        <button type="button" onclick="this.parentElement.remove()"> Supprimer</button>
+      `;
+      document.getElementById("productList").appendChild(productDiv);
+    }
+
+    document.getElementById("orderForm").onsubmit = async (e) => {
+      e.preventDefault();
+
+      const productDivs = document.querySelectorAll("#productList .product");
+      const products = [];
+
+      productDivs.forEach(div => {
+        const id = parseInt(div.querySelector("input[name='id']").value);
+        const quantity = parseInt(div.querySelector("input[name='quantity']").value);
+        if (!isNaN(id) && !isNaN(quantity)) {
+          products.push({ id, quantity });
+        }
+      });
+
+      const response = await fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products })
+      });
+
+      const result = await response.json();
+
+      if (response.status === 302) {
+        document.getElementById("result").innerText = " Commande créée avec succès. ID: " + result.order_id;
+      } else {
+        document.getElementById("result").innerText = " Erreur : " + JSON.stringify(result);
+      }
+    };
+  </script>
+</body>
+</html>

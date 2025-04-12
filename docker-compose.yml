@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: api8inf349
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:5
+    ports:
+      - "6379:6379"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      REDIS_URL: redis://redis:6379
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: api8inf349
+      DB_USER: user
+      DB_PASSWORD: pass
+    command: ["./wait-for-postgres.sh", "db", "5432", "flask", "run", "--host=0.0.0.0"]
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    depends_on:
+      - web
+      - db
+      - redis
+    environment:
+      FLASK_APP: app.py
+      REDIS_URL: redis://redis:6379
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: api8inf349
+      DB_USER: user
+      DB_PASSWORD: pass
+    command: ["./wait-for-postgres.sh", "db", "5432", "flask", "worker", "run"]
+
+volumes:
+  pgdata:

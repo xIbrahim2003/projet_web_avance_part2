@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mettre à jour ou payer une commande</title>
+  <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/page/index.html"> Accueil</a> |
+    <a href="/page/order.html"> Créer une commande</a> |
+    <a href="/page/track.html"> Suivre une commande</a> |
+    <a href="/page/update.html"> Mettre à jour / Payer</a>
+  </nav>
+  
+  <h1>Mettre à jour une commande</h1>
+  <form id="updateForm">
+    <label>ID commande : <input name="order_id" type="number" required></label><br>
+
+    <h3>Client</h3>
+    <label>Email : <input name="email" type="email"></label><br>
+
+    <h3>Adresse de livraison</h3>
+    <label>Pays : <input name="country" type="text"></label><br>
+    <label>Adresse : <input name="address" type="text"></label><br>
+    <label>Code postal : <input name="postal_code" type="text"></label><br>
+    <label>Ville : <input name="city" type="text"></label><br>
+    <label>Province : <input name="province" type="text"></label><br>
+
+    <button type="submit">Mettre à jour</button>
+  </form>
+
+  <h1>Payer une commande</h1>
+  <form id="payForm">
+    <label>ID commande : <input name="order_id" type="number" required></label><br>
+
+    <h3>Carte de crédit</h3>
+    <label>Nom : <input name="cc_name" type="text"></label><br>
+    <label>Numéro : <input name="cc_number" type="text"></label><br>
+    <label>CVV : <input name="cvv" type="text"></label><br>
+    <label>Exp Mois : <input name="exp_month" type="number"></label><br>
+    <label>Exp Année : <input name="exp_year" type="number"></label><br>
+
+    <button type="submit">Payer</button>
+  </form>
+
+  <pre id="response"></pre>
+
+  <script>
+    document.getElementById("updateForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const order_id = f.order_id.value;
+      const orderData = {};
+
+      if (f.email.value) orderData.email = f.email.value;
+      if (f.country.value && f.address.value && f.postal_code.value && f.city.value && f.province.value) {
+        orderData.shipping_information = {
+          country: f.country.value,
+          address: f.address.value,
+          postal_code: f.postal_code.value,
+          city: f.city.value,
+          province: f.province.value
+        };
+      }
+
+      const res = await fetch(`/order/${order_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: orderData })
+      });
+
+      const data = await res.json();
+      document.getElementById("response").innerText = JSON.stringify(data, null, 2);
+    };
+
+    document.getElementById("payForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const order_id = f.order_id.value;
+
+      const credit_card = {
+        name: f.cc_name.value,
+        number: f.cc_number.value,
+        expiration_month: parseInt(f.exp_month.value),
+        expiration_year: parseInt(f.exp_year.value),
+        cvv: f.cvv.value
+      };
+
+      const res = await fetch(`/order/${order_id}/shops/pay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credit_card })
+      });
+
+      const data = await res.json();
+      document.getElementById("response").innerText = JSON.stringify(data, null, 2);
+    };
+  </script>
+</body>
+</html>

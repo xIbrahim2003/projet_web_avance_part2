@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Suivi commande</title>
+  <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/page/index.html"> Accueil</a> |
+    <a href="/page/order.html"> Créer une commande</a> |
+    <a href="/page/track.html"> Suivre une commande</a> |
+    <a href="/page/update.html"> Mettre à jour / Payer</a>
+  </nav>
+  <h1>Suivre une commande</h1>
+  <form id="trackForm">
+    <label>ID commande: <input name="order_id" type="number" required></label><br>
+    <button type="submit">Suivre</button>
+  </form>
+
+  <pre id="orderInfo"></pre>
+
+  <script>
+    document.getElementById("trackForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const id = e.target.order_id.value;
+      const response = await fetch(`/order/${id}`);
+      if (response.status === 202) {
+        document.getElementById("orderInfo").innerText = " Paiement en cours...";
+      } else if (response.status === 200) {
+        const result = await response.json();
+        document.getElementById("orderInfo").innerText = JSON.stringify(result.order, null, 2);
+      } else {
+        document.getElementById("orderInfo").innerText = "Commande introuvable.";
+      }
+    };
+  </script>
+</body>
+</html>

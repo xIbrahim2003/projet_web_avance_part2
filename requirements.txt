@@ -1,0 +1,6 @@
+flask
+peewee
+requests
+psycopg2-binary
+redis
+rq==1.15.1 

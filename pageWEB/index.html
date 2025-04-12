@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Produits</title>
+  <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+  <!-- Barre de navigation -->
+  <nav>
+    <a href="/page/index.html"> Accueil</a> |
+    <a href="/page/order.html"> Créer une commande</a> |
+    <a href="/page/track.html"> Suivre une commande</a> |
+    <a href="/page/update.html"> Mettre à jour / Payer</a>
+  </nav>
+
+  <h1>Liste des produits</h1>
+  <div id="products"></div>
+
+  <script>
+    fetch("/")
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById("products");
+        data.products.forEach(p => {
+          container.innerHTML += `<p><strong>${p.name}</strong> - ${p.price} $</p>`;
+        });
+      });
+  </script>
+</body>
+</html>
+
