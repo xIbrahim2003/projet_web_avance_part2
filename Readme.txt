@@ -2,6 +2,8 @@ README - Projet de session
 Cours : Technologies Web Avancées
 Réalisé par : Mamadou Ciré Bah, Ibrahim Diakité, Aboubacar Demba Bah, Mariama Ndour Sagne
 
+lien vers la vidéo de présentation : https://uqac.ca.panopto.com/Panopto/Pages/Viewer.aspx?id=fa4b212d-ac01-433c-b949-b2c90037beab
+
 Structure du projet
 
 I)Le projet contient les fichiers principaux suivants :
